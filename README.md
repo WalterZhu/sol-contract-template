@@ -48,7 +48,7 @@ sol-contract-template/
 确保你的开发环境已安装以下工具：
 
 - **Rust** >= 1.89.0
-- **Solana CLI** >= 1.18.0
+- **Solana CLI** >= 2.2.0 (推荐使用 Agave)
 - **Anchor CLI** >= 0.31.0
 - **Node.js** >= 16.0.0
 - **Yarn** (推荐) 或 npm
@@ -60,10 +60,16 @@ sol-contract-template/
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-2. 安装 Solana CLI:
+2. 安装 Solana CLI (使用新的 Agave 安装器):
 ```bash
-sh -c "$(curl -sSfL https://release.solana.com/v1.18.26/install)"
+# 安装最新稳定版 (推荐)
+curl -sSfL https://release.anza.xyz/stable/install | sh
+
+# 或安装特定版本
+# curl -sSfL https://release.anza.xyz/v2.2.21/install | sh
 ```
+
+**注意**: Solana Labs 仓库已于 2025年1月归档，现由 Anza 维护 Agave 项目。
 
 3. 安装 Anchor CLI:
 ```bash
@@ -74,9 +80,16 @@ avm use latest
 
 4. 验证安装:
 ```bash
-rustc --version
-solana --version
-anchor --version
+rustc --version    # 应显示 1.89.0 或更高版本
+solana --version   # 应显示 2.2.x (Agave) 或更高版本
+anchor --version   # 应显示 0.31.x 或更高版本
+```
+
+**示例输出**:
+```
+rustc 1.89.0 (29483883e 2025-08-04)
+solana-cli 2.2.21 (src:23e01995; feat:3073396398, client:Agave)
+anchor-cli 0.31.1
 ```
 
 ## 编译构建
@@ -103,6 +116,8 @@ cargo build
 # 发布模式编译
 cargo build --release
 ```
+
+**注意**: 如果遇到 `anchor build` 的 Cargo.lock 版本兼容问题，可以先使用 `cargo build` 进行开发和测试。
 
 ## 使用流程
 
@@ -239,9 +254,60 @@ yarn lint:fix
 - `DataTooLong`: 数据过长
 - `Unauthorized`: 权限不足
 
+## 故障排除
+
+### Platform-tools 下载问题
+
+如果遇到 `anchor build` 时 platform-tools 相关错误，可以手动下载：
+
+**Apple Silicon (M1/M2/M3) Mac**:
+```bash
+curl -L -o platform-tools.tar.bz2 \
+  "https://github.com/anza-xyz/platform-tools/releases/download/v1.48/platform-tools-osx-aarch64.tar.bz2"
+```
+
+**Intel Mac**:
+```bash
+curl -L -o platform-tools.tar.bz2 \
+  "https://github.com/anza-xyz/platform-tools/releases/download/v1.48/platform-tools-osx-x86_64.tar.bz2"
+```
+
+然后解压到正确位置：
+```bash
+# 解压到 Solana 安装目录
+tar -xjf platform-tools.tar.bz2 -C ~/.cache/solana/v1.48/platform-tools/
+```
+
+### 其他常见问题
+
+- **Cargo.lock 版本错误**: 删除 `Cargo.lock` 后重新运行 `cargo update`
+- **网络连接问题**: 检查防火墙设置，确保可以访问 GitHub 和 crates.io
+- **磁盘空间不足**: platform-tools 约需要 300MB 空间
+
+## 部署信息
+
+### Testnet 部署
+
+**程序地址**: `CSeMuL6j2DLdbiiQo7i4NU9yy99ohJ5wCmw8QabFJcAn`
+
+**网络**: Solana Devnet
+
+**浏览器链接**: 
+- [程序详情](https://explorer.solana.com/address/CSeMuL6j2DLdbiiQo7i4NU9yy99ohJ5wCmw8QabFJcAn?cluster=devnet)
+- [部署交易](https://explorer.solana.com/tx/35AncvKki4bmHBDAuUhjpYrbSRHshKjmEfBnV1pxMo2xNbiLwYRAJoQkNwMESiCpjLvKdCe9Q5pobADPUeESAJkD?cluster=devnet)
+
+**程序功能测试**:
+```bash
+# 连接到 devnet
+solana config set --url devnet
+
+# 查看程序信息
+solana program show CSeMuL6j2DLdbiiQo7i4NU9yy99ohJ5wCmw8QabFJcAn
+```
+
 ## 许可证
 
-ISC License
+本项目采用 ISC 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
 ## 贡献
 
